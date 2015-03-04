@@ -22,7 +22,12 @@ def connection
 end
 
 def get_paginated_repos(page)
-  response = connection.get "/users/#{ENV['USER_NAME']}/repos?type=owner&page=#{page}&access_token=#{ENV['ACCESS_TOKEN']}"
+  url = "/users/#{ENV['USER_NAME']}/repos?type=owner&page=#{page}"
+  if ENV['ACCESS_TOKEN']
+    url += "&access_token=#{ENV['ACCESS_TOKEN']}"
+  end
+
+  response = connection.get url
   JSON.parse response.body
 end
 
