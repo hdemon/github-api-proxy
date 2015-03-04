@@ -3,16 +3,30 @@ require 'sinatra'
 require 'faraday'
 
 get '/api/repositories' do
-  repos = []
-  page = 1
+  if expire_cache
+    repos = []
+    page = 1
 
-  begin
-    _repos = get_paginated_repos(page)
-    repos.concat _repos
-    page += 1
-  end until _repos.empty?
+    begin
+      _repos = get_paginated_repos(page)
+      repos.concat _repos
+      page += 1
+    end until _repos.empty?
 
-  generate_repositories_json select_display_item(repos)
+    $previous_period = Time.now
+    $cache = generate_repositories_json select_display_item(repos)
+    $cache
+  else
+    $cache
+  end
+end
+
+def expire_cache
+  !$cache || went_on_certain_period
+end
+
+def went_on_certain_period
+  Time.now - $previous_period > 600
 end
 
 def connection
