@@ -1,9 +1,12 @@
 require 'json'
 require 'sinatra'
 require 'faraday'
+require './cache'
 
 get '/api/repositories' do
-  if expire_cache
+  $cache = $cache || Cache.new
+
+  if $cache.expire?
     repos = []
     page = 1
 
@@ -13,20 +16,12 @@ get '/api/repositories' do
       page += 1
     end until _repos.empty?
 
-    $previous_period = Time.now
-    $cache = generate_repositories_json select_display_item(repos)
-    $cache
+    $cache.expire
+    $cache.content = generate_repositories_json select_display_item(repos)
+    $cache.content
   else
-    $cache
+    $cache.content
   end
-end
-
-def expire_cache
-  !$cache || went_on_certain_period
-end
-
-def went_on_certain_period
-  Time.now - $previous_period > 600
 end
 
 def connection
