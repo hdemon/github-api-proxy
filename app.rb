@@ -3,10 +3,12 @@ require 'sinatra'
 require 'faraday'
 require './cache'
 
-get '/api/repositories' do
-  $cache = $cache || Cache.new
+$cache = {}
 
-  if $cache.expire?
+get '/api/repositories' do
+  $cache[:repositories] = $cache[:repositories] || Cache.new
+
+  if $cache[:repositories].expire?
     repos = []
     page = 1
 
@@ -16,23 +18,58 @@ get '/api/repositories' do
       page += 1
     end until _repos.empty?
 
-    $cache.expire
-    $cache.content = generate_repositories_data select_display_item(repos)
+    $cache[:repositories].expire
+    $cache[:repositories].content = generate_repositories_data select_display_item(repos)
   end
 
   response = Response.new
-  response.data = $cache.content
+  response.data = $cache[:repositories].content
   response.render
 end
 
 get '/api/articles' do
-  generate_articles_index_json get_articles
+  $cache[:article_index] = $cache[:article_index] || Cache.new
+  $cache[:article_index].content = generate_article_index_data get_articles
+
+  response = Response.new
+  response.data = $cache[:article_index].content
+  response.render
+end
+
+get '/api/articles/:name' do
+  $cache[:articles] = $cache[:articles] || {}
+  $cache[:articles][params[:name]] = $cache[:articles][params[:name]] || Cache.new
+  $cache[:articles][params[:name]].content = generate_article_data get_article params[:name]
+
+  response = Response.new
+  response.data = $cache[:articles][params[:name]].content
+  response.render
 end
 
 def connection
   Faraday.new(url: 'https://api.github.com') do |faraday|
     faraday.adapter Faraday.default_adapter
   end
+end
+
+def get_articles
+  url = "/repos/#{ENV['USER_NAME']}/hdemon-articles/contents/articles"
+  if ENV['ACCESS_TOKEN']
+    url += "?access_token=#{ENV['ACCESS_TOKEN']}"
+  end
+
+  response = connection.get url
+  JSON.parse response.body
+end
+
+def get_article(name)
+  url = "/repos/#{ENV['USER_NAME']}/hdemon-articles/contents/articles/#{name}"
+  if ENV['ACCESS_TOKEN']
+    url += "?access_token=#{ENV['ACCESS_TOKEN']}"
+  end
+
+  response = connection.get url
+  JSON.parse response.body
 end
 
 def get_paginated_repos(page)
@@ -47,6 +84,14 @@ end
 
 def select_display_item(repos)
   repos.select {|repository| repository['description'].match(/\s{3}\Z/) }
+end
+
+def generate_article_index_data(articles)
+  articles.map {|article| article['name'] }
+end
+
+def generate_article_data(data)
+  data
 end
 
 def generate_repositories_data(repos)
