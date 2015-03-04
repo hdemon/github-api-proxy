@@ -12,7 +12,7 @@ get '/api/repositories' do
     page += 1
   end until _repos.empty?
 
-  generate_display_item_json select_display_item(repos)
+  generate_repositories_json select_display_item(repos)
 end
 
 def connection
@@ -30,7 +30,7 @@ def select_display_item(repos)
   repos.select {|repository| repository['description'].match(/\s{3}\Z/) }
 end
 
-def generate_display_item_json(repos)
+def generate_repositories_json(repos)
   repos.map do |repository|
     {
       name: repository['name'],
