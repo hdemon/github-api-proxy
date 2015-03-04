@@ -17,11 +17,16 @@ get '/api/repositories' do
     end until _repos.empty?
 
     $cache.expire
-    $cache.content = generate_repositories_json select_display_item(repos)
-    $cache.content
-  else
-    $cache.content
+    $cache.content = generate_repositories_data select_display_item(repos)
   end
+
+  response = Response.new
+  response.data = $cache.content
+  response.render
+end
+
+get '/api/articles' do
+  generate_articles_index_json get_articles
 end
 
 def connection
@@ -55,10 +60,14 @@ def generate_repositories_data(repos)
   end
 end
 
-def generate_repositories_json(repos)
-  {
-      message: "success",
-      errors: [],
-      data: generate_repositories_data(repos)
-  }.to_json
+class Response
+  attr_accessor :data, :message, :error
+
+  def render
+    {
+        message: @message || "Success.",
+        errors: @errors || [],
+        data: @data
+    }.to_json
+  end
 end
