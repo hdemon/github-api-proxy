@@ -4,6 +4,7 @@ source "https://rubygems.org"
 gem "rake"
 gem "sinatra"
 gem "faraday"
+gem "pry"
 
 group :test do
   gem 'rspec'
