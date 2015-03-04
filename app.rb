@@ -30,7 +30,7 @@ def select_display_item(repos)
   repos.select {|repository| repository['description'].match(/\s{3}\Z/) }
 end
 
-def generate_repositories_json(repos)
+def generate_repositories_data(repos)
   repos.map do |repository|
     {
       name: repository['name'],
@@ -38,5 +38,13 @@ def generate_repositories_json(repos)
       html_url: repository['html_url'],
       star: repository['star'],
     }
-  end.to_json
+  end
+end
+
+def generate_repositories_json(repos)
+  {
+      message: "success",
+      errors: [],
+      data: generate_repositories_data(repos)
+  }.to_json
 end
