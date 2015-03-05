@@ -99,7 +99,12 @@ def select_display_item(repos)
 end
 
 def generate_article_index_data(articles)
-  articles.map {|article| article['name'] }
+  articles.map do |article|
+    {
+      title: article['name'].match(/\A.+(?=\_)/),
+      publish_date: article['name'].match(/(?<=\_)[0-9\-]{10}/)[0].gsub(/\-/, '/')
+    }
+  end
 end
 
 def generate_article_data(data)
