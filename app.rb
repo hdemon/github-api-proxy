@@ -2,6 +2,7 @@ require 'json'
 require 'sinatra'
 require 'faraday'
 require './cache'
+require './response'
 
 $cache = {}
 
@@ -106,17 +107,5 @@ def generate_repositories_data(repos)
       html_url: repository['html_url'],
       star: repository['star'],
     }
-  end
-end
-
-class Response
-  attr_accessor :data, :message, :error
-
-  def render
-    {
-        message: @message || "Success.",
-        errors: @errors || [],
-        data: @data
-    }.to_json
   end
 end
