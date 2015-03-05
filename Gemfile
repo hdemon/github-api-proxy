@@ -3,6 +3,7 @@ source "https://rubygems.org"
 
 gem "rake"
 gem "sinatra"
+gem "sinatra-cross_origin", "~> 0.3.1"
 gem "faraday"
 gem "pry"
 

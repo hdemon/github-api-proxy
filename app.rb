@@ -1,9 +1,14 @@
 require 'json'
 require 'base64'
 require 'sinatra'
+require 'sinatra/cross_origin'
 require 'faraday'
 require './cache'
 require './response'
+
+configure do
+  enable :cross_origin
+end
 
 $cache = {}
 
