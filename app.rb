@@ -5,6 +5,7 @@ require 'sinatra/cross_origin'
 require 'faraday'
 require './cache'
 require './response'
+require "pry"
 
 configure do
   enable :cross_origin
@@ -114,7 +115,7 @@ def generate_repositories_data(repos)
       name: repository['name'],
       description: repository['description'],
       html_url: repository['html_url'],
-      star: repository['star'],
+      stargazers_count: repository['stargazers_count'],
     }
   end
 end
