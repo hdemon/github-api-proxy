@@ -1,4 +1,5 @@
 require 'json'
+require 'base64'
 require 'sinatra'
 require 'faraday'
 require './cache'
@@ -96,7 +97,11 @@ def generate_article_index_data(articles)
 end
 
 def generate_article_data(data)
-  data
+  binding.pry
+  {
+    name: data['name'],
+    content: Base64.decode64(data['content']),
+  }
 end
 
 def generate_repositories_data(repos)
