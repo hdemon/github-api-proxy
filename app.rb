@@ -29,7 +29,9 @@ end
 
 get '/api/articles' do
   $cache[:article_index] = $cache[:article_index] || Cache.new
-  $cache[:article_index].content = generate_article_index_data get_articles
+  if $cache[:article_index].expire?
+    $cache[:article_index].content = generate_article_index_data get_articles
+  end
 
   response = Response.new
   response.data = $cache[:article_index].content
@@ -39,7 +41,9 @@ end
 get '/api/articles/:name' do
   $cache[:articles] = $cache[:articles] || {}
   $cache[:articles][params[:name]] = $cache[:articles][params[:name]] || Cache.new
-  $cache[:articles][params[:name]].content = generate_article_data get_article params[:name]
+  if $cache[:articles][params[:name]].expire?
+    $cache[:articles][params[:name]].content = generate_article_data get_article params[:name]
+  end
 
   response = Response.new
   response.data = $cache[:articles][params[:name]].content
