@@ -101,6 +101,7 @@ end
 def generate_article_index_data(articles)
   articles.map do |article|
     {
+      name: article['name'],
       title: article['name'].match(/\A.+(?=\_)/),
       publish_date: article['name'].match(/(?<=\_)[0-9\-]{10}/)[0].gsub(/\-/, '/')
     }
