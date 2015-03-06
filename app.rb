@@ -1,4 +1,5 @@
 require 'json'
+require 'uri'
 require 'base64'
 require 'sinatra'
 require 'sinatra/cross_origin'
@@ -80,7 +81,7 @@ def get_article(name)
     url += "?access_token=#{ENV['ACCESS_TOKEN']}"
   end
 
-  response = connection.get url
+  response = connection.get URI.encode url
   JSON.parse response.body
 end
 
